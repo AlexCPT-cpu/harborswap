@@ -19,7 +19,8 @@
     "react-icons": "^4.11.0",
     "viem": "^1.16.6",
     "wagmi": "^1.4.5",
-    "web3": "^4.2.0"
+    "web3": "^4.2.0",
+    "zustand": "^4.4.4"
   },
   "devDependencies": {
     "@types/node": "^20",

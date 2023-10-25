@@ -14,12 +14,17 @@ export function ThemeToggle() {
       setTheme("light");
     }
   }, [setTheme]);
+
+  const themeHandler = (theme: string) => {
+    setTheme(theme);
+    localStorage.setItem("theme", theme.toString());
+  };
   return (
     <button>
       {theme === "light" ? (
-        <MoonIcon onClick={() => setTheme("dark")} className="w-8 lg:w-9" />
+        <MoonIcon onClick={() => themeHandler("dark")} className="w-8 lg:w-9" />
       ) : (
-        <SunIcon onClick={() => setTheme("light")} className="w-8 lg:w-9" />
+        <SunIcon onClick={() => themeHandler("light")} className="w-8 lg:w-9" />
       )}
     </button>
   );

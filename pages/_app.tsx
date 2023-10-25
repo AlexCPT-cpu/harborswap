@@ -3,7 +3,7 @@ import type { AppProps } from "next/app";
 import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi/react";
 
 import { WagmiConfig } from "wagmi";
-import { arbitrum, mainnet } from "wagmi/chains";
+import { arbitrum, mainnet, bsc, polygon } from "wagmi/chains";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 
 // 1. Get projectId
@@ -17,11 +17,19 @@ const metadata = {
   icons: ["https://avatars.githubusercontent.com/u/37784886"],
 };
 
-const chains = [mainnet, arbitrum];
+const chains = [mainnet, bsc, polygon, arbitrum];
 const wagmiConfig = defaultWagmiConfig({ chains, projectId, metadata });
 
-// 3. Create modal
-createWeb3Modal({ wagmiConfig, projectId, chains });
+createWeb3Modal({
+  wagmiConfig,
+  projectId,
+  chains,
+  themeVariables: {
+    "--w3m-color-mix": "#FDE047",
+    "--w3m-accent": "#000000",
+    "--w3m-color-mix-strength": 40,
+  },
+});
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
