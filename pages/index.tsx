@@ -1,7 +1,7 @@
-import Image from "next/image";
 import { Inter } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import Swap from "@/components/Swap/";
+import TokenModal from "@/components/Modals/TokenModal";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -11,6 +11,7 @@ export default function Home() {
       <Navbar />
       <div className="flex w-full justify-center items-center">
         <Swap />
+        <TokenModal />
       </div>
     </main>
   );

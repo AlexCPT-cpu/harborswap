@@ -1,7 +1,10 @@
+import { ModalStore } from '@/types'
 import { create } from 'zustand'
 
-const useStore = create((set) => ({
-  open: false,
-  increasePopulation: () => set((state: {open:boolean}) => ({ open: state.open })),
-  removeAllBears: () => set({ open: false }),
+const useModal = create<ModalStore>((set) => ({
+    modalState:false,
+    modalIndex: 0,
+    toogleModal:(state:boolean) => set({modalState : state}),
+    toogleIndex:(index: number | string) => set({ modalIndex: index})
 }))
+export default useModal

@@ -22,9 +22,9 @@ export function ThemeToggle() {
   return (
     <button>
       {theme === "light" ? (
-        <MoonIcon onClick={() => themeHandler("dark")} className="w-8 lg:w-9" />
+        <MoonIcon onClick={() => themeHandler("dark")} className="w-6 lg:w-7" />
       ) : (
-        <SunIcon onClick={() => themeHandler("light")} className="w-8 lg:w-9" />
+        <SunIcon onClick={() => themeHandler("light")} className="w-6 lg:w-7" />
       )}
     </button>
   );
