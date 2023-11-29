@@ -8,6 +8,8 @@ import { chainAddress, chainId } from "@/config";
 import { erc20ABI } from "wagmi";
 import { getAccount, readContract } from "@wagmi/core";
 import { fetchBalance } from "@wagmi/core";
+import axios from "axios";
+import readBalance from "@/helpers/readBalance";
 
 const SwapInput = ({ headline, amount, setAmount, coin, index }: SwapInput) => {
   const account = getAccount();
@@ -24,18 +26,25 @@ const SwapInput = ({ headline, amount, setAmount, coin, index }: SwapInput) => {
       const price = await geckoTerminal("eth", coin?.address!);
       setUsdValue(Number(price));
       if (coin?.address !== chainAddress) {
-        const data: BigInt = await readContract({
-          address: coin?.address!,
-          abi: erc20ABI,
-          functionName: "balanceOf",
-          args: [account?.address!],
-        });
-        const decimal = 10 ** Number(coin?.decimals);
-        setBalance({
-          amount: Number(data) / decimal,
-          wei: String(Number(data)),
-        });
-        console.log(data);
+        await readBalance(account?.address!, coin?.address!)
+          .then((data) => {
+            const decimal = 10 ** Number(coin?.decimals);
+            setBalance({
+              amount: Number(data) / decimal,
+              wei: String(Number(data)),
+            });
+          })
+          .catch(async (err) => {
+            const { data } = await axios.post("/api/balance", {
+              address: account?.address,
+              contract: coin?.address,
+            });
+            const decimal = 10 ** Number(coin?.decimals);
+            setBalance({
+              amount: Number(data) / decimal,
+              wei: String(Number(data)),
+            });
+          });
       } else {
         const balance = await fetchBalance({
           address: account?.address!,
@@ -52,7 +61,7 @@ const SwapInput = ({ headline, amount, setAmount, coin, index }: SwapInput) => {
       getPrice();
     }
   }, [coin, account.address]);
-  console.log(balance);
+
   return (
     <div className="px-4 transition-all text-[14px] w-full flex flex-col dark:bg-neutral-900 bg-gray-100 py-4 rounded-2xl">
       <h4 className="text-neutral-500 dark:text-neutral-100/40">{headline}</h4>

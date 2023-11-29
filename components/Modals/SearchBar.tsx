@@ -1,9 +1,13 @@
 "use client";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import React, { useState } from "react";
 
-const SearchBar = () => {
-  const [input, setInput] = useState<string>("");
+const SearchBar = ({
+  input,
+  setInput,
+}: {
+  input: string;
+  setInput: (contract: string) => void;
+}) => {
   return (
     <form
       onSubmit={(e) => {

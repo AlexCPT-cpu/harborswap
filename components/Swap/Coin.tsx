@@ -15,7 +15,7 @@ const Coin = ({ coin, onClick }: { coin: Coin; onClick: () => void }) => {
     >
       <div onClick={() => {}}>
         {coin.logoURI ? (
-          <CoinImg width={50} height={50} src={coin.logoURI} />
+          <CoinImg width={70} height={70} src={coin.logoURI} />
         ) : (
           <div>
             <QuestionMarkCircleIcon className="w-7" />

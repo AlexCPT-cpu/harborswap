@@ -1,21 +1,22 @@
 import useModal from "@/hooks/useModal";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import SearchBar from "./SearchBar";
 import primary from "../../primary.json";
 import tokenList from "../../tokenlist.json";
 import CoinCol from "./CoinCol";
 import Coin from "./Coin";
 import useCoin from "@/hooks/useCoin";
-import useAmounts from "@/hooks/useAmounts";
 import useLiquidity from "@/hooks/useLiquidity";
+import validateAddress from "@/helpers/validateAddress";
 
 export default function TokenModal() {
   const { modalState, toogleModal, modalIndex, toogleIndex } = useModal();
   const { handleIn, handleOut, coinIn, coinOut } = useCoin();
-
+  const [input, setInput] = useState<string>("");
   const { setNoLiquidity } = useLiquidity();
+  const [searched, setSearched] = useState<any>();
 
   const handleCoinSelect = (coin: Coin, index: number | string) => {
     setNoLiquidity(false);
@@ -33,6 +34,22 @@ export default function TokenModal() {
     toogleModal(false);
   };
 
+  const isAddress = useMemo(() => {
+    const validate = validateAddress(input);
+    return validate;
+  }, [input]);
+
+  const filter = useMemo(() => {
+    tokenList.tokens.filter((token) => {
+      if (token.address === input) {
+        setSearched(token);
+      } else {
+        setSearched({});
+      }
+    });
+  }, [input]);
+
+  console.log(searched);
   return (
     <Transition appear show={modalState} as={Fragment}>
       <Dialog
@@ -75,7 +92,7 @@ export default function TokenModal() {
                   />
                 </Dialog.Title>
                 <div className="mt-5 px-6">
-                  <SearchBar />
+                  <SearchBar input={input!} setInput={setInput} />
                 </div>
 
                 <div className="mt-4 flex flex-wrap gap-2 border-b pt-3 pb-5 px-6 border-b-black/50 dark:border-b-white/10">
@@ -94,22 +111,27 @@ export default function TokenModal() {
                     );
                   })}
                 </div>
-
-                <div className="mt-4 flex w-full flex-col pb-15 h-[420px] border-b-black/50 dark:border-b-white/1 overflow-auto space-y-2 scroll-smooth">
-                  {tokenList?.tokens?.map((token, index) => {
-                    const disabled =
-                      token?.address === coinIn?.address ||
-                      token?.address === coinOut?.address;
-                    return (
-                      <CoinCol
-                        disabled={disabled}
-                        onClick={() => handleCoinSelect(token, modalIndex)}
-                        coin={token}
-                        key={index}
-                      />
-                    );
-                  })}
-                </div>
+                {isAddress ? (
+                  <div className="mt-4 flex w-full flex-col pb-15 h-[420px] border-b-black/50 dark:border-b-white/1 overflow-auto space-y-2 scroll-smooth transition-all">
+                    {tokenList?.tokens?.map((token, index) => {
+                      const disabled =
+                        token?.address === coinIn?.address ||
+                        token?.address === coinOut?.address;
+                      return (
+                        <CoinCol
+                          disabled={disabled}
+                          onClick={() => handleCoinSelect(token, modalIndex)}
+                          coin={token}
+                          key={index}
+                        />
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="flex justify-center mt-20 font-bold text-xl transition-all">
+                    Invalid Address
+                  </div>
+                )}
               </Dialog.Panel>
             </Transition.Child>
           </div>

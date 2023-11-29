@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import SwapInput from "./SwapInput";
 import useCoin from "@/hooks/useCoin";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
@@ -29,6 +29,15 @@ const SwapModule = () => {
   const [approveLoading, setApproveLoading] = useState<boolean>(false);
   const { noLiquidity, setNoLiquidity } = useLiquidity();
   const [rate, setRate] = useState<number>(0);
+  const [typingTimeout, setTypingTimeout] = useState<any>(null);
+
+  useEffect(() => {
+    return () => {
+      if (typingTimeout) {
+        clearTimeout(typingTimeout);
+      }
+    };
+  }, [typingTimeout]);
 
   const qte = useCallback(
     async (amt: number, wei: string) => {
@@ -57,24 +66,34 @@ const SwapModule = () => {
     setNoLiquidity(false);
     setLoading(true);
     handleAmountIn(amt, wei);
+
+    if (typingTimeout) {
+      clearTimeout(typingTimeout);
+    }
+
+    setTypingTimeout(
+      setTimeout(() => {
+        makeAPICall(amt, wei);
+      }, 2000)
+    );
     if (!loading) {
-      qte(Number(amt), String(wei))
-        .then((value) => {
-          if (value) {
-            const decimal = 10 ** coinOut?.decimals;
-            const parsed = parseInt(value?.toAmount) / decimal;
-            const input = document.getElementById("inputAmt1");
-            //@ts-ignore
-            input.value = parsed.toFixed(3).toLocaleString();
-            setPrice(parsed / Number(amt));
-            handleAmountOut(parsed, value);
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-          setNoLiquidity(true);
-        })
-        .finally(() => setLoading(false));
+      // qte(Number(amt), String(wei))
+      //   .then((value) => {
+      //     if (value) {
+      //       const decimal = 10 ** coinOut?.decimals;
+      //       const parsed = parseInt(value?.toAmount) / decimal;
+      //       const input = document.getElementById("inputAmt1");
+      //       //@ts-ignore
+      //       input.value = parsed.toFixed(3).toLocaleString();
+      //       setPrice(parsed / Number(amt));
+      //       handleAmountOut(parsed, value);
+      //     }
+      //   })
+      //   .catch((error) => {
+      //     console.log(error);
+      //     setNoLiquidity(true);
+      //   })
+      //   .finally(() => setLoading(false));
     } else {
       console.log("loading Price");
     }
@@ -91,11 +110,16 @@ const SwapModule = () => {
   };
   const account = getAccount();
 
+  const makeAPICall = (searchValue: any, anotherVal: any) => {
+    console.log("Making API call with search value:", searchValue, anotherVal);
+  };
+
   useEffect(() => {
     const get = async () => {
       setNoLiquidity(false);
       setApproveLoading(true);
       const data = await readContract({
+        //@ts-ignore
         address: coinIn.address,
         abi: erc20ABI,
         functionName: "allowance",
