@@ -5,13 +5,20 @@ import useModal from "@/hooks/useModal";
 import { useEffect, useState } from "react";
 import geckoTerminal from "@/helpers/geckoTerminal";
 import { chainAddress, chainId } from "@/config";
-import { erc20ABI } from "wagmi";
-import { getAccount, readContract } from "@wagmi/core";
+import { getAccount } from "@wagmi/core";
 import { fetchBalance } from "@wagmi/core";
 import axios from "axios";
 import readBalance from "@/helpers/readBalance";
+import Skeleton from "@mui/material/Skeleton";
 
-const SwapInput = ({ headline, amount, setAmount, coin, index }: SwapInput) => {
+const SwapInput = ({
+  headline,
+  amount,
+  setAmount,
+  coin,
+  index,
+  loading,
+}: SwapInput) => {
   const account = getAccount();
   const { toogleModal, toogleIndex } = useModal();
   const [usdValue, setUsdValue] = useState<number>(0);
@@ -31,7 +38,7 @@ const SwapInput = ({ headline, amount, setAmount, coin, index }: SwapInput) => {
             const decimal = 10 ** Number(coin?.decimals);
             setBalance({
               amount: Number(data) / decimal,
-              wei: String(Number(data)),
+              wei: Number(data).toString(),
             });
           })
           .catch(async (err) => {
@@ -42,7 +49,7 @@ const SwapInput = ({ headline, amount, setAmount, coin, index }: SwapInput) => {
             const decimal = 10 ** Number(coin?.decimals);
             setBalance({
               amount: Number(data) / decimal,
-              wei: String(Number(data)),
+              wei: Number(data).toString(),
             });
           });
       } else {
@@ -63,24 +70,32 @@ const SwapInput = ({ headline, amount, setAmount, coin, index }: SwapInput) => {
   }, [coin, account.address]);
 
   return (
-    <div className="px-4 transition-all text-[14px] w-full flex flex-col dark:bg-neutral-900 bg-gray-100 py-4 rounded-2xl">
+    <div className="px-4 transition-all text-[14px] w-full flex flex-col dark:bg-neutral-900 bg-gray-100 py-2 rounded-2xl">
       <h4 className="text-neutral-500 dark:text-neutral-100/40">{headline}</h4>
       <div className="flex flex-col w-full items-center">
-        <div className="flex flex-row w-full justify-between items-center mt-1 mb-3">
+        <div className="flex flex-row w-full justify-between items-center">
           <div>
-            <input
-              className="outline-none bg-transparent w-full text-4xl dark:placeholder:text-neutral-100/20 placeholder:text-neutral-400"
-              placeholder="0"
-              type="number"
-              id={`inputAmt${index}`}
-              onChange={(e) => {
-                const decimals = 10 ** Number(coin?.decimals);
-                setAmount(
-                  Number(e.currentTarget.value),
-                  String(Number(e.currentTarget.value) * decimals)
-                );
-              }}
-            />
+            {loading ? (
+              <Skeleton
+                variant="text"
+                sx={{ fontSize: "1rem", width: "80px", height: "60px" }}
+              />
+            ) : (
+              <input
+                disabled={index === 1}
+                className="outline-none disabled:cursor-not-allowed bg-transparent w-full my-1 text-3xl dark:placeholder:text-neutral-100/20 placeholder:text-neutral-400"
+                placeholder="0"
+                type="number"
+                id={`inputAmt${index}`}
+                onChange={(e) => {
+                  const decimals = 10 ** Number(coin?.decimals);
+                  setAmount(
+                    Number(e.currentTarget.value),
+                    (Number(e.currentTarget.value) * decimals).toString()
+                  );
+                }}
+              />
+            )}
           </div>
           <div>
             {coin?.symbol ? (

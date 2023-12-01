@@ -21,6 +21,7 @@ export interface SwapInput {
   coin?: Coin;
   index: number | string;
   balance?: string | number;
+  loading?: boolean
 }
 
 export interface ModalStore {

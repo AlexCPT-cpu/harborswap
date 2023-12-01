@@ -3,8 +3,8 @@ import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Fragment, useMemo, useState } from "react";
 import SearchBar from "./SearchBar";
-import primary from "../../primary.json";
-import tokenList from "../../tokenlist.json";
+import primary from "@/constants/primary.json";
+import { tokenList } from "@/constants/tokenlist";
 import CoinCol from "./CoinCol";
 import Coin from "./Coin";
 import useCoin from "@/hooks/useCoin";
@@ -40,7 +40,7 @@ export default function TokenModal() {
   }, [input]);
 
   const filter = useMemo(() => {
-    tokenList.tokens.filter((token) => {
+    tokenList.filter((token) => {
       if (token.address === input) {
         setSearched(token);
       } else {
@@ -113,7 +113,7 @@ export default function TokenModal() {
                 </div>
                 {isAddress ? (
                   <div className="mt-4 flex w-full flex-col pb-15 h-[420px] border-b-black/50 dark:border-b-white/1 overflow-auto space-y-2 scroll-smooth transition-all">
-                    {tokenList?.tokens?.map((token, index) => {
+                    {tokenList?.map((token, index) => {
                       const disabled =
                         token?.address === coinIn?.address ||
                         token?.address === coinOut?.address;
