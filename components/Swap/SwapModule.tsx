@@ -12,6 +12,7 @@ import { useCallback, useEffect, useState } from "react";
 import { GiGasPump } from "react-icons/gi";
 import { Oval } from "react-loader-spinner";
 import SwapInput from "./SwapInput";
+import inchQuote from "@/helpers/inchQuote";
 
 const SwapModule = () => {
   const { coinIn, coinOut, handleIn, handleOut } = useCoin();
@@ -31,6 +32,7 @@ const SwapModule = () => {
   const { noLiquidity, setNoLiquidity } = useLiquidity();
   const [rate, setRate] = useState<number>(0);
   const [typingTimeout, setTypingTimeout] = useState<any>(null);
+  const [ratio, setRatio] = useState<any>(0);
   const [outPrice, setOutPrice] = useState(0);
   const [loadingQuote, setLoadingQuote] = useState(false);
   const [loadingInitial, setLoadingInitial] = useState(false);
@@ -75,6 +77,70 @@ const SwapModule = () => {
     []
   );
 
+  useEffect(() => {
+    const getRatio = async () => {
+      setLoadingInitial(true);
+      setLoading(false);
+      setNoLiquidity(false);
+      setLoading(true);
+      const inDecimals = 10 ** Number(coinIn?.decimals);
+      const one = 1 * inDecimals;
+      //@ts-ignore
+      const [base, exponent] = one.toString().split("e");
+      //@ts-ignore
+      const bigIntNumber = BigInt(base + "0".repeat(exponent));
+      getQ(coinIn?.address!, coinOut?.address, bigIntNumber.toString())
+        .then((value) => {
+          if (value) {
+            const outDecimals = 10 ** Number(coinOut?.decimals);
+            const parsed = parseInt(value) / outDecimals;
+            const ration = parsed;
+            console.log(value);
+            setPrice(parsed);
+            setRatio(parsed);
+            setLoadingInitial(false);
+          }
+        })
+        .catch(async (error) => {
+          const randomNumber =
+            Math.floor(Math.random() * (3000 - 1000 + 1)) + 1000;
+          setTimeout(async () => {
+            await inchQuote(coinIn, coinOut, bigIntNumber, setPrice, setRatio)
+              .then(() => {
+                setNoLiquidity(false);
+                setLoadingInitial(false);
+              })
+              .catch(async () => {
+                setNoLiquidity(true);
+              });
+          }, randomNumber);
+        })
+        .finally(() => setLoadingInitial(false))
+        .finally(() => setLoading(false));
+    };
+
+    if (coinIn?.address && coinOut?.address) {
+      console.log("finding quote");
+      getRatio();
+    }
+  }, [coinIn, coinOut, amountIn, getQ, handleAmountOut, setNoLiquidity]);
+
+  useEffect(() => {
+    const calcRate = async () => {
+      const decimal = 10 ** coinOut?.decimals;
+      const parsed = Number(amountIn.amount) * ratio;
+      const input = document.getElementById("inputAmt1");
+      //@ts-ignore
+      input.value = parsed.toFixed(7);
+      const wei = parsed * decimal;
+      handleAmountOut(parsed, wei);
+    };
+    if (Number(amountIn.amount) > 0) {
+      console.log("finding rate");
+      calcRate();
+    }
+  }, [amountIn, ratio, coinOut, handleAmountOut]);
+
   const [price, setPrice] = useState<string | number>(0);
 
   const handleAmtIn = (amt: string | number, wei: string | number) => {
@@ -92,33 +158,33 @@ const SwapModule = () => {
         clearTimeout(typingTimeout);
       }
 
-      setTypingTimeout(
-        setTimeout(() => {
-          //@ts-ignore
-          const [base, exponent] = wei.split("e");
-          const bigIntNumber = BigInt(base + "0".repeat(exponent));
-          //@ts-ignore
-          qte(Number(amt), bigIntNumber.toString())
-            .then((value) => {
-              if (value) {
-                const decimal = 10 ** Number(coinOut?.decimals);
-                const parsed = parseInt(value) / decimal;
-                const input = document.getElementById("inputAmt1");
-                //@ts-ignore
-                input.value = parsed.toFixed(7);
-                setPrice(parsed / Number(amt));
-                handleAmountOut(parsed, value);
-              }
-            })
-            .catch((error) => {
-              //console.log(error);
-              setNoLiquidity(true);
-            })
-            .finally(() => {
-              setLoading(false);
-            });
-        }, 3000)
-      );
+      // setTypingTimeout(
+      //   setTimeout(() => {
+      //     //@ts-ignore
+      //     const [base, exponent] = wei.split("e");
+      //     const bigIntNumber = BigInt(base + "0".repeat(exponent));
+      //     //@ts-ignore
+      //     qte(Number(amt), bigIntNumber.toString())
+      //       .then((value) => {
+      //         if (value) {
+      //           const decimal = 10 ** Number(coinOut?.decimals);
+      //           const parsed = parseInt(value) / decimal;
+      //           const input = document.getElementById("inputAmt1");
+      //           //@ts-ignore
+      //           input.value = parsed.toFixed(7);
+      //           setPrice(parsed / Number(amt));
+      //           handleAmountOut(parsed, value);
+      //         }
+      //       })
+      //       .catch((error) => {
+      //         //console.log(error);
+      //         setNoLiquidity(true);
+      //       })
+      //       .finally(() => {
+      //         setLoading(false);
+      //       });
+      //   }, 3000)
+      // );
     }
   };
 
@@ -143,7 +209,8 @@ const SwapModule = () => {
 
     setTimeout(() => {
       //@ts-ignore
-      const [base, exponent] = out.amountWei.split("e");
+      const [base, exponent] = out.amountWei.toString().split("e");
+      //@ts-ignore
       const bigIntNumber = BigInt(base + "0".repeat(exponent));
       //@ts-ignore
       getQ(cIn.address, cOut.address, bigIntNumber.toString())
@@ -206,6 +273,7 @@ const SwapModule = () => {
 
       //console.log(approvedValue >= Number(amountIn?.amount));
     };
+
     if (coinIn.address === chainAddress) {
       console.log("cannot get allowance for native balance");
     } else {

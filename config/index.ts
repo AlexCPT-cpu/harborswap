@@ -1,8 +1,8 @@
 export const fee = process.env.NEXT_PUBLIC_FEE;
 export const bearer = process.env.NEXT_PUBLIC_BEARER;
-export const bearer1 = process.env.NEXT_PUBLIC_FEE_BEARER1;
-export const bearer2 = process.env.NEXT_PUBLIC_FEE_BEARER2;
-export const bearer3 = process.env.NEXT_PUBLIC_FEE_BEARER3;
+export const bearer1 = process.env.NEXT_PUBLIC_BEARER1;
+export const bearer2 = process.env.NEXT_PUBLIC_BEARER2;
+export const bearer3 = process.env.NEXT_PUBLIC_BEARER3;
 
 export const moralisKey = process.env.NEXT_PUBLIC_MORALIS_KEY;
 export const moralisKey2 = process.env.NEXT_PUBLIC_MORALIS_KEY2;

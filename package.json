@@ -15,6 +15,7 @@
     "@heroicons/react": "^2.0.18",
     "@moralisweb3/common-evm-utils": "^2.23.2",
     "@mui/material": "^5.14.19",
+    "@vercel/kv": "^1.0.0",
     "@web3modal/wagmi": "^3.1.0",
     "alchemy-sdk": "^3.0.0",
     "axios": "^1.6.0",
