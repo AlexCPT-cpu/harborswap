@@ -1,32 +1,22 @@
-import { Inter } from "next/font/google";
+import SlippageModal from "@/components/Modals/SlippageModal";
+import TokenModal from "@/components/Modals/TokenModal";
 import Navbar from "@/components/Navbar";
 import Swap from "@/components/Swap/";
-import TokenModal from "@/components/Modals/TokenModal";
-import { useEffect } from "react";
-import axios from "axios";
-import { erc20ABI, readContract } from "@wagmi/core";
-import { oneInchContract } from "@/config";
+import { Inter } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
-  useEffect(() => {
-    const test = async () => {
-      const data = await axios.get("/api/approval");
-      console.log(data);
-    };
-    // test();
-  }, []);
-
   return (
-    <main
-      className={`${inter.className} min-h-screen px-3 w-full text-black bg-white dark:bg-black dark:text-white justify-center items-center flex-col`}
+    <div
+      className={`${inter.className} min-h-screen w-full text-black bg-white dark:bg-black dark:text-white justify-center items-center flex-col`}
     >
       <Navbar />
-      <div className="flex w-full justify-center items-center">
+      <div className="flex w-full h-full mx-auto justify-center items-center px-3">
         <Swap />
         <TokenModal />
+        <SlippageModal />
       </div>
-    </main>
+    </div>
   );
 }

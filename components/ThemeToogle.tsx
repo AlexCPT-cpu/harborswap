@@ -20,7 +20,7 @@ export function ThemeToggle() {
     localStorage.setItem("theme", theme.toString());
   };
   return (
-    <button>
+    <button className="pr-3">
       {theme === "light" ? (
         <MoonIcon onClick={() => themeHandler("dark")} className="w-6 lg:w-7" />
       ) : (

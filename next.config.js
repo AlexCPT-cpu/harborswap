@@ -11,8 +11,7 @@ const nextConfig = {
       "s2.coinmarketcap.com",
       "ethereum-optimism.github.io",
       "tokens.1inch.io",
-      "tokens.1inch.io",
-      "tokens.1inch.io",
+      "images.unsplash.com",
     ],
   },
 };

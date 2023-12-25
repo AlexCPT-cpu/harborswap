@@ -13,9 +13,11 @@ const Coin = ({ coin, onClick }: { coin: Coin; onClick: () => void }) => {
       onClick={onClick}
       className="flex flex-row transition-all items-center pl-1 pr-3 ml-2 justify-between cursor-pointer dark:bg-black bg-white hover:bg-neutral-200/70  dark:hover:bg-neutral-800 active:bg-neutral-100 dark:active:bg-neutral-700 border-black dark:border-neutral-800/90 py-1 border rounded-full space-x-2"
     >
-      <div onClick={() => {}}>
+      <div>
         {coin.logoURI ? (
-          <CoinImg width={50} height={50} src={coin.logoURI} />
+          <div className="w-6 h-6">
+            <CoinImg width={50} height={50} src={coin.logoURI} />
+          </div>
         ) : (
           <div>
             <QuestionMarkCircleIcon className="w-7" />

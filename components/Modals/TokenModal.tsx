@@ -1,7 +1,7 @@
 import useModal from "@/hooks/useModal";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import SearchBar from "./SearchBar";
 import primary from "@/constants/primary.json";
 import { tokenList } from "@/constants/tokenlist";
@@ -10,8 +10,15 @@ import Coin from "./Coin";
 import useCoin from "@/hooks/useCoin";
 import useLiquidity from "@/hooks/useLiquidity";
 import validateAddress from "@/helpers/validateAddress";
+import axios from "axios";
 
 export default function TokenModal() {
+  const tokens = useMemo(() => {
+    const saved = localStorage.getItem("user-saved-tokens");
+    const parsed = JSON.parse(saved!);
+    const all = [...tokenList, ...parsed];
+    return all;
+  }, []);
   const { modalState, toogleModal, modalIndex, toogleIndex } = useModal();
   const { handleIn, handleOut, coinIn, coinOut } = useCoin();
   const [input, setInput] = useState<string>("");
@@ -39,17 +46,52 @@ export default function TokenModal() {
     return validate;
   }, [input]);
 
-  const filter = useMemo(() => {
-    tokenList.filter((token) => {
-      if (token.address === input) {
-        setSearched(token);
-      } else {
-        setSearched({});
-      }
-    });
-  }, [input]);
+  const filtered = useMemo(
+    () =>
+      tokens.filter((token) => {
+        if (isAddress) {
+          if (token.address === input) {
+            return token;
+          }
+        } else {
+          if (token.symbol.toLowerCase().startsWith(input.toLowerCase())) {
+            return token;
+          }
+        }
+      }),
+    [input, tokens, isAddress]
+  );
+  useEffect(() => {
+    const findToken = async () => {
+      try {
+        const { data } = await axios.post("/api/token", { contract: input });
+        const formated = {
+          name: data.name,
+          symbol: data.symbol,
+          logoURI: data.logo ?? "",
+          address: input,
+          decimals: data.decimals,
+        };
+        setSearched([formated]);
+        const saved = localStorage.getItem("user-saved-tokens");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          const exists = parsed.some((obj: any) => obj.address === input);
 
-  console.log(searched);
+          if (!exists) {
+            const final = [...parsed, formated];
+
+            localStorage.setItem("user-saved-tokens", JSON.stringify(final));
+          }
+        } else {
+          localStorage.setItem("user-saved-tokens", JSON.stringify([formated]));
+        }
+      } catch (error) {}
+    };
+    if (isAddress && filtered.length == 0) {
+      findToken();
+    }
+  }, [filtered, input, isAddress]);
   return (
     <Transition appear show={modalState} as={Fragment}>
       <Dialog
@@ -111,7 +153,7 @@ export default function TokenModal() {
                     );
                   })}
                 </div>
-                {isAddress ? (
+                {!input ? (
                   <div className="mt-4 flex w-full flex-col pb-15 h-[420px] border-b-black/50 dark:border-b-white/1 overflow-auto space-y-2 scroll-smooth transition-all">
                     {tokenList?.map((token, index) => {
                       const disabled =
@@ -128,9 +170,45 @@ export default function TokenModal() {
                     })}
                   </div>
                 ) : (
-                  <div className="flex justify-center mt-20 font-bold text-xl transition-all">
-                    Invalid Address
-                  </div>
+                  <>
+                    {filtered.length > 0 ? (
+                      <div className="mt-4 flex w-full flex-col pb-15 h-[420px] border-b-black/50 dark:border-b-white/1 overflow-auto space-y-2 scroll-smooth transition-all">
+                        {filtered?.map((token, index) => {
+                          const disabled =
+                            token?.address === coinIn?.address ||
+                            token?.address === coinOut?.address;
+                          return (
+                            <CoinCol
+                              disabled={disabled}
+                              onClick={() =>
+                                handleCoinSelect(token, modalIndex)
+                              }
+                              coin={token}
+                              key={index}
+                            />
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="mt-4 flex w-full flex-col pb-15 h-[420px] border-b-black/50 dark:border-b-white/1 overflow-auto space-y-2 scroll-smooth transition-all">
+                        {searched?.map((token: any, index: any) => {
+                          const disabled =
+                            token?.address === coinIn?.address ||
+                            token?.address === coinOut?.address;
+                          return (
+                            <CoinCol
+                              disabled={disabled}
+                              onClick={() =>
+                                handleCoinSelect(token, modalIndex)
+                              }
+                              coin={token}
+                              key={index}
+                            />
+                          );
+                        })}
+                      </div>
+                    )}
+                  </>
                 )}
               </Dialog.Panel>
             </Transition.Child>

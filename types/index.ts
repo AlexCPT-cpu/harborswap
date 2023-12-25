@@ -76,6 +76,12 @@ export interface Token {
   tags: Array<string>;
 }
 
+export interface SlippageStore {
+  slippageState:boolean,
+  slippage: number | string,
+  toogleState:(state:boolean) => void,
+  setSlippage:(index: number | string) => void
+}
 export interface Amount  {
   amount: string | number,
   amountWei: string | number

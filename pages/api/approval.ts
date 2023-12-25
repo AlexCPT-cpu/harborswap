@@ -2,11 +2,17 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
 import { moralisArray } from "@/config";
 import { kv } from "@vercel/kv";
+import { delay } from "@/helpers/delay";
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   if (req.method === "POST") {
+    const randomNumber =
+    Math.floor(Math.random() * (2000 - 1000 + 1)) + 1000;
+
+    await delay(randomNumber)
+
     const sessionQuote = await kv.get("moralis");
 
     const { contract, address, spender } = req.body;

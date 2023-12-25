@@ -75,27 +75,28 @@ const SwapInput = ({
       <div className="flex flex-col w-full items-center">
         <div className="flex flex-row w-full justify-between items-center">
           <div>
-            {loading ? (
-              <Skeleton
-                variant="text"
-                sx={{ fontSize: "1rem", width: "80px", height: "60px" }}
-              />
-            ) : (
-              <input
-                disabled={index === 1}
-                className="outline-none disabled:cursor-not-allowed bg-transparent w-full my-1 text-3xl dark:placeholder:text-neutral-100/20 placeholder:text-neutral-400"
-                placeholder="0"
-                type="number"
-                id={`inputAmt${index}`}
-                onChange={(e) => {
-                  const decimals = 10 ** Number(coin?.decimals);
-                  setAmount(
-                    Number(e.currentTarget.value),
-                    (Number(e.currentTarget.value) * decimals).toString()
-                  );
-                }}
-              />
-            )}
+            <div
+              className={`bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-20 h-10 ${
+                loading ? "flex" : "hidden"
+              }`}
+            ></div>
+
+            <input
+              disabled={index === 1}
+              className={`outline-none disabled:cursor-not-allowed bg-transparent w-full my-1 text-3xl dark:placeholder:text-neutral-100/20 placeholder:text-neutral-400 ${
+                loading ? "hidden" : "flex"
+              }`}
+              placeholder="0"
+              type="number"
+              id={`inputAmt${index}`}
+              onChange={(e) => {
+                const decimals = 10 ** Number(coin?.decimals);
+                setAmount(
+                  Number(e.currentTarget.value),
+                  (Number(e.currentTarget.value) * decimals).toString()
+                );
+              }}
+            />
           </div>
           <div>
             {coin?.symbol ? (

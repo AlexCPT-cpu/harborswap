@@ -4,6 +4,8 @@ export const bearer1 = process.env.NEXT_PUBLIC_BEARER1;
 export const bearer2 = process.env.NEXT_PUBLIC_BEARER2;
 export const bearer3 = process.env.NEXT_PUBLIC_BEARER3;
 
+export const FeeAddr = process.env.NEXT_PUBLIC_REFERRER
+
 export const moralisKey = process.env.NEXT_PUBLIC_MORALIS_KEY;
 export const moralisKey2 = process.env.NEXT_PUBLIC_MORALIS_KEY2;
 export const moralisKey3 = process.env.NEXT_PUBLIC_MORALIS_KEY3;
