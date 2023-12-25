@@ -13,14 +13,6 @@ import validateAddress from "@/helpers/validateAddress";
 import axios from "axios";
 
 export default function TokenModal() {
-  const tokens = useMemo(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("user-saved-tokens");
-      const parsed = JSON.parse(saved!);
-      const all = [...tokenList, ...parsed];
-      return all;
-    }
-  }, []);
   const { modalState, toogleModal, modalIndex, toogleIndex } = useModal();
   const { handleIn, handleOut, coinIn, coinOut } = useCoin();
   const [input, setInput] = useState<string>("");
@@ -48,6 +40,18 @@ export default function TokenModal() {
     return validate;
   }, [input]);
 
+  const tokens = useMemo(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("user-saved-tokens");
+      const parsed = JSON.parse(saved!);
+      if (parsed) {
+        const all = [...tokenList, ...parsed];
+        return all;
+      } else {
+        return tokenList;
+      }
+    }
+  }, []);
   const filtered = useMemo(
     () =>
       tokens?.filter((token) => {
